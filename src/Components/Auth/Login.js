@@ -20,7 +20,8 @@ const Title = styled.h2`
   font-weight: 600;
 `;
 
-const RoleButton = styled.button`
+const RoleButton = styled.button
+`
   width: 100%;
   padding: 15px;
   margin: 10px 0;
@@ -98,9 +99,11 @@ const Login = () => {
             if (response.data.token) {
                 localStorage.setItem('token', JSON.stringify({
                     token: response.data.token,
-                    role: selectedRole
+                    role: selectedRole,
+                    userId: response.data.userId[0]
                 }));
                 localStorage.setItem('userRole', selectedRole);
+                localStorage.setItem('userId', response.data.userId);
 
                 switch(selectedRole) {
                     case 'admin':

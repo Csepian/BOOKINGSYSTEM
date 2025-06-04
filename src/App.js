@@ -7,11 +7,15 @@ import Header from './Layout/Header';
 import Footer from './Layout/Footer';
 import styled from 'styled-components';
 import GuestDashboard from './Components/Dashboard/GuestDashboard';
+import ManagerDashboard from './Components/Dashboard/ManagerDashboard';
 import Home from './Components/Home';
 import GetUserBookings from './Components/GetUserBookings';
 import BookRoom from './Components/BookRoom';
 import GetHotelsById from './Components/GetHotelById';
 import GetHotelReviews from './Components/GetHotelReviews';
+import GetBookings from './Components/GetBookings';
+import GetBookingById from './Components/GetBookingbyId';
+import GetBookingByHotelId from './Components/GetBookingByHotelId';
 const MainContent = styled.main`
   min-height: calc(100vh - 160px); // Adjust based on header/footer height
   padding: 20px;
@@ -35,20 +39,24 @@ function App() {
             <Route path="/admin/manage-hotels" element={<ManageHotels />} />
           </Route> */}
 
-          {/* Manager Routes */}
-          {/* <Route element={<ProtectedRoute allowedRoles={['manager']} />}>
+          
+           <Route element={<ProtectedRoute allowedRoles={['manager']} />}>
             <Route path="/manager-dashboard" element={<ManagerDashboard />} />
-            <Route path="/manager/bookings" element={<ManageBookings />} />
-          </Route> */}
+            <Route path="/bookings" element={<GetBookings />} />
+            <Route path="/Components/GetBookings" element={<GetUserBookings/>} />
+            <Route path="/bookings/:bookingID" element={<GetBookingById />} />
+            <Route path="/hotel/:hotelID" element={<GetBookingByHotelId />} />
+            {/* <Route path="/manager/bookings" element={<ManageBookings />} /> */}
+          </Route>
 
-          {/* Guest Routes */}
+           Guest Routes
           <Route element={<ProtectedRoute allowedRoles={['guest']} />}>
             <Route path="/guest-dashboard" element={<GuestDashboard />} />
             <Route path="/booking" element={<BookRoom />} />
             <Route path="/my-bookings" element={<GetUserBookings />} />
             <Route path="/hotel-details/:hotelID" element={<GetHotelsById />} />
             <Route path="/hotel-reviews/:hotelID" element={<GetHotelReviews />} />
-          </Route>
+          </Route> 
 
           
         </Routes>
