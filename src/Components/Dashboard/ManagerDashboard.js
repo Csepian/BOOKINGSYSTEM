@@ -85,7 +85,7 @@ const ManagerDashboard = () => {
     {
       icon: FaDollarSign,
       label: "Total Revenue",
-      value: `$${stats.revenue.toLocaleString()}`,
+      value: `${stats.revenue.toLocaleString()}`,
       color: "#00cec9"
     },
     {

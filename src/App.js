@@ -36,6 +36,12 @@ import Contact from './Components/Contact';
 import SpecialOffers from './Components/SpecialOffers';
 import ManageRevews from './Components/Auth/ManageReviews';
 
+import ScrollToTop from './Components/ScrollToTop';
+import NotFound from './Components/NotFound';
+import GetUsersAllBookings from './Components/GetUsersAllBookings';
+import Payment from './Components/Payment';
+import PaymentSuccess from './Components/PaymentSuccess';
+
 
 
 const MainContent = styled.main`
@@ -92,6 +98,13 @@ function App() {
             <Route path="/hotel-rooms/:hotelID/add" element={<AddRoom />} />
             <Route path="/hotel-rooms/:hotelID/update" element={<UpdateRoom />} />
             <Route path="/available-rooms/:hotelID/:checkIn/:checkOut" element={<GetAvailableRooms />} />
+
+            <Route path="/manager-dashboard" element={<ManagerDashboard/>} />
+          <Route path="/all-bookings" element={<ViewAllBookings />} />
+          <Route path="/manager-available-rooms" element={<ManagerAvailableRooms />} />
+          <Route path="/view-guests" element={<ViewGuests />} />
+          <Route path="/bookings/user/:userId" element={<GetBookingByUser />} />
+          <Route path="/bookings/room/:roomId" element={<GetBookingByRoom />} />
 
           </Route>
 
