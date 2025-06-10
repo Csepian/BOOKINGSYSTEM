@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { FiArrowLeft, FiTrash2, FiEdit2, FiSearch } from 'react-icons/fi';
 import axios from 'axios';
 import styled from 'styled-components';
-
+ 
 import {
   PageContainer,
   HeaderSection,
@@ -18,7 +18,7 @@ import {
   LoadingSpinner,
   Message
 } from '../Styles/ManagePageStyles';
-
+ 
 const SearchBar = styled.div`
   display: flex;
   align-items: center;
@@ -27,7 +27,7 @@ const SearchBar = styled.div`
   padding: 10px;
   background: #f8fafc;
   border-radius: 8px;
-
+ 
   input {
     flex: 1;
     padding: 10px;
@@ -35,18 +35,18 @@ const SearchBar = styled.div`
     border-radius: 6px;
     outline: none;
     font-size: 0.95rem;
-
+ 
     &:focus {
       border-color: #4f46e5;
       box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
     }
-
+ 
     &::placeholder {
       color: #94a3b8;
     }
   }
 `;
-
+ 
 const EditModal = styled.div`
   position: fixed;
   top: 50%;
@@ -60,7 +60,7 @@ const EditModal = styled.div`
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   z-index: 1001;
 `;
-
+ 
 const Overlay = styled.div`
   position: fixed;
   top: 0;
@@ -71,13 +71,13 @@ const Overlay = styled.div`
   backdrop-filter: blur(4px);
   z-index: 1000;
 `;
-
+ 
 const EditForm = styled.form`
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
 `;
-
+ 
 const EditFormGroup = styled.div`
   label {
     display: block;
@@ -85,14 +85,14 @@ const EditFormGroup = styled.div`
     color: #374151;
     margin-bottom: 0.5rem;
   }
-
+ 
   input {
     width: 100%;
     padding: 0.75rem;
     border: 2px solid #e5e7eb;
     border-radius: 0.5rem;
     font-size: 1rem;
-
+ 
     &:focus {
       border-color: #4f46e5;
       box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
@@ -100,7 +100,7 @@ const EditFormGroup = styled.div`
     }
   }
 `;
-
+ 
 const ConfirmationModal = styled.div`
   position: fixed;
   top: 50%;
@@ -114,46 +114,46 @@ const ConfirmationModal = styled.div`
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   z-index: 1001;
 `;
-
+ 
 const ModalButtons = styled.div`
   display: flex;
   justify-content: flex-end;
   gap: 1rem;
 `;
-
+ 
 const ConfirmationModalButtons = styled(ModalButtons)`
   margin-top: 2rem;
   justify-content: center;
   gap: 1rem;
-
+ 
   button {
     min-width: 120px;
-
+ 
     &:first-child {
       background-color: #4f46e5;
       color: white;
-      
+     
       &:hover {
         background-color: #4338ca;
       }
     }
-
+ 
     &:last-child {
       background-color: #ef4444;
       color: white;
-      
+     
       &:hover {
         background-color: #dc2626;
       }
     }
-
+ 
     &:disabled {
       opacity: 0.7;
       cursor: not-allowed;
     }
   }
 `;
-
+ 
 const ManageGuests = () => {
   const navigate = useNavigate();
   const [guests, setGuests] = useState([]);
@@ -164,11 +164,11 @@ const ManageGuests = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [deletingGuest, setDeletingGuest] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
+ 
   useEffect(() => {
     fetchGuests();
   }, []);
-
+ 
   const fetchGuests = async () => {
     setLoading(true);
     try {
@@ -177,31 +177,31 @@ const ManageGuests = () => {
           'Content-Type': 'application/json'
         }
       });
-      
+     
       if (response.data) {
         setGuests(response.data);
         setError('');
       }
     } catch (err) {
       console.error('Fetch error:', err);
-      const errorMessage = err.response?.data?.message || 
+      const errorMessage = err.response?.data?.message ||
                            'Failed to fetch guests. Please try again later.';
       setError(errorMessage);
     } finally {
       setLoading(false);
     }
   };
-
+ 
   const handleEditClick = (guest) => {
     setEditingGuest(guest);
     setSuccessMessage('');
   };
-
+ 
   const handleSaveEdit = async (e) => {
     e.preventDefault();
     setError('');
     setIsSubmitting(true);
-
+ 
     try {
       // Input validation
       if (!editingGuest.name?.trim() || !editingGuest.email?.trim() || !editingGuest.contactNumber?.trim()) {
@@ -209,21 +209,21 @@ const ManageGuests = () => {
         setIsSubmitting(false);
         return;
       }
-
+ 
       const emailRegex = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
       if (!emailRegex.test(editingGuest.email)) {
         setError('Invalid email format');
         setIsSubmitting(false);
         return;
       }
-
+ 
       const contactRegex = /^[0-9]{10}$/;
       if (!contactRegex.test(editingGuest.contactNumber)) {
         setError('Contact number must be 10 digits');
         setIsSubmitting(false);
         return;
       }
-
+ 
       const updateData = {
         userID: editingGuest.userID,
         name: editingGuest.name.trim(),
@@ -231,15 +231,15 @@ const ManageGuests = () => {
         contactNumber: editingGuest.contactNumber.trim(),
         role: "guest"
       };
-
-
-
+ 
+ 
+ 
       const response = await axios.patch(
         `https://localhost:7125/api/User/${updateData.userID}`,
         updateData
-
+ 
       );
-
+ 
       if (response.status === 200 || response.status === 204) {
         // Update local state
         setGuests(prevGuests =>
@@ -261,30 +261,30 @@ const ManageGuests = () => {
       } else if (err.response?.status === 409) {
         setError('Email address is already in use');
       } else {
-        setError('');
+        setError('Failed to update guest. Please try again.');
       }
     } finally {
       setIsSubmitting(false);
     }
   };
-
+ 
   const handleDeleteClick = (guest) => {
     setDeletingGuest(guest);
     setError('');
     setSuccessMessage('');
   };
-
+ 
   const confirmDelete = async () => {
     try {
       setIsSubmitting(true);
       setError('');
-
+ 
       // First check if guest has any active bookings
       try {
         const checkResponse = await axios.get(
           `https://localhost:7125/api/User/${deletingGuest.userID}`
         );
-        console.log(checkResponse.data);
+       
         if (checkResponse.data.hasActiveBookings) {
           setError('Cannot delete guest with active bookings');
           return;
@@ -295,7 +295,7 @@ const ManageGuests = () => {
           return;
         }
       }
-
+ 
       const response = await axios.delete(
         `https://localhost:7125/api/User/${deletingGuest.userID}`,
         {
@@ -305,13 +305,13 @@ const ManageGuests = () => {
           }
         }
       );
-
+ 
       if (response.status === 200 || response.status === 204) {
-        setGuests(prevGuests => 
+        setGuests(prevGuests =>
           prevGuests.filter(g => g.userID !== deletingGuest.userID)
         );
         setSuccessMessage(`Guest "${deletingGuest.name}" was successfully deleted`);
-        
+       
         // Close modal after short delay to show success message
         setTimeout(() => {
           setDeletingGuest(null);
@@ -324,7 +324,7 @@ const ManageGuests = () => {
           case 404:
             setError('Guest not found. They may have been already deleted.');
             // Remove from local state if not found
-            setGuests(prevGuests => 
+            setGuests(prevGuests =>
               prevGuests.filter(g => g.userID !== deletingGuest.userID)
             );
             break;
@@ -337,8 +337,6 @@ const ManageGuests = () => {
           case 403:
             setError('You do not have permission to delete this guest.');
             break;
-          case 415:
-            setError('Unsupported media type. Please try again.');
           default:
             setError('Failed to delete guest. Please try again.');
         }
@@ -351,19 +349,19 @@ const ManageGuests = () => {
       setIsSubmitting(false);
     }
   };
-
-  const filteredGuests = guests.filter(guest => 
+ 
+  const filteredGuests = guests.filter(guest =>
     guest.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     guest.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
     guest.contactNumber.includes(searchTerm)
   );
-
+ 
   if (loading) return (
     <PageContainer>
       <LoadingSpinner>Loading guests...</LoadingSpinner>
     </PageContainer>
   );
-
+ 
   return (
     <PageContainer>
       <HeaderSection>
@@ -377,11 +375,11 @@ const ManageGuests = () => {
           <div style={{ width: '120px' }} />
         </ButtonGroup>
       </HeaderSection>
-
+ 
       <ContentCard>
         {error && <Message $type="error">{error}</Message>}
         {successMessage && <Message $type="success">{successMessage}</Message>}
-
+ 
         <Table>
           <thead>
             <tr>
@@ -414,7 +412,7 @@ const ManageGuests = () => {
           </tbody>
         </Table>
       </ContentCard>
-
+ 
       {editingGuest && (
         <>
           <Overlay onClick={() => !isSubmitting && setEditingGuest(null)} />
@@ -478,14 +476,14 @@ const ManageGuests = () => {
           </EditModal>
         </>
       )}
-
+ 
       {deletingGuest && (
         <>
           <Overlay onClick={() => !isSubmitting && setDeletingGuest(null)} />
           <ConfirmationModal>
             <h3>Delete Guest</h3>
             <p>
-              Are you sure you want to delete {deletingGuest.name}? 
+              Are you sure you want to delete {deletingGuest.name}?
               This action cannot be undone.
             </p>
             {error && <Message $type="error">{error}</Message>}
@@ -512,5 +510,5 @@ const ManageGuests = () => {
     </PageContainer>
   );
 };
-
+ 
 export default ManageGuests;

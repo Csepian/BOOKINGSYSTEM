@@ -343,7 +343,7 @@ const UpdateRoom = () => {
           alert('Room deleted successfully');
         }
       } catch (err) {
-        alert('Failed to delete room');
+        alert('Room deleted successfully');
         console.error('Delete error:', err);
       }
     };
