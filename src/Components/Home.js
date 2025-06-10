@@ -72,21 +72,7 @@ const SearchContainer = styled.div`
   }
 `;
 
-const SearchLabel = styled.label`
-  position: absolute;
-  left: 25px;
-  top: -10px;
-  background: white;
-  padding: 0 8px;
-  font-size: 0.8rem;
-  color: #6b7280;
-  border-radius: 10px;
-  z-index: 1;
 
-  @media (max-width: 1024px) {
-    font-size: 0.75rem;
-  }
-`;
 
 const SearchInput = styled.input`
   flex: 1;
@@ -222,7 +208,7 @@ const Home = () => {
         <Title>Find Your Perfect Stay</Title>
         <SearchForm onSubmit={(e) => e.preventDefault()}>
           <SearchGroup>
-            <SearchLabel>Hotel Name</SearchLabel>
+          
             <SearchContainer>
               <SearchInput
                 type="text"
@@ -239,7 +225,7 @@ const Home = () => {
           </SearchGroup>
 
           <SearchGroup>
-            <SearchLabel>Location</SearchLabel>
+         
             <SearchContainer>
               <SearchInput
                 type="text"
@@ -256,7 +242,7 @@ const Home = () => {
           </SearchGroup>
 
           <SearchGroup>
-            <SearchLabel>Amenities</SearchLabel>
+       
             <SearchContainer>
               <SearchInput
                 type="text"

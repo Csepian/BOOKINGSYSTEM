@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import styled from "styled-components";
 import GetHotelReviews from './GetHotelReviews';
+import { ErrorMessage } from "./Styles";
 
 const PageContainer = styled.div`
   min-height: 100vh;
@@ -200,6 +201,12 @@ const InfoItem = styled.div`
     color: #007bff;
   }
 `;
+const WarningMessage = styled.div`
+  color: #dc3545;
+  font-size: 0.875rem;
+  margin-top: -10px;
+  margin-bottom: 10px;
+`;
 
 const GetHotelsById = ({isEmbedded=false, embeddedCheckIn='', embeddedCheckOut=''}) => {
   const { hotelID } = useParams();
@@ -213,7 +220,16 @@ const GetHotelsById = ({isEmbedded=false, embeddedCheckIn='', embeddedCheckOut='
     const images = ['/Images/1390015.jpg', '/Images/362619.jpg', '/Images/366875.jpg'];
     return images[Math.floor(Math.random() * images.length)];
   };
-
+  const getMaxDate = () => {
+    const maxDate = new Date();
+    maxDate.setFullYear(maxDate.getFullYear() + 1);
+    return maxDate.toISOString().split('T')[0];
+  };
+            // Add this validation function 
+const validateDates = (checkIn, checkOut) => {
+  if (!checkIn || !checkOut) return true;
+  return new Date(checkOut) > new Date(checkIn);
+};
   useEffect(() => {
     const fetchHotel = async () => {
       try {
@@ -299,35 +315,69 @@ const GetHotelsById = ({isEmbedded=false, embeddedCheckIn='', embeddedCheckOut='
             </MapContainer>
           </DetailsList>
 
-          <BookingSection>
-            <h3 style={{ marginBottom: 20 }}>Book Your Stay</h3>
-            <DateInput
-              type="date"
-              value={checkIn}
-              onChange={(e) => setCheckIn(e.target.value)}
-              min={new Date().toISOString().split('T')[0]}
-              required
-              placeholder="Check-in Date"
-            />
-            <DateInput
-              type="date"
-              value={checkOut}
-              onChange={(e) => setCheckOut(e.target.value)}
-              min={checkIn || new Date().toISOString().split('T')[0]}
-              required
-              placeholder="Check-out Date"
-            />
-            <BookButton
-              onClick={() => {
-                if (checkIn && checkOut) {
-                  navigate(`/available-rooms/${hotelID}/${checkIn}/${checkOut}`);
-                }
-              }}
-              disabled={!checkIn || !checkOut}
-            >
-              View Available Rooms
-            </BookButton>
-          </BookingSection>
+<BookingSection>
+  <h3 style={{ marginBottom: 20 }}>Book Your Stay</h3>
+  <DateInput
+    type="date"
+    value={checkIn}
+    onChange={(e) => {
+      const selectedDate = new Date(e.target.value);
+      const maxDate = new Date(getMaxDate());
+      if (selectedDate <= maxDate) {
+        setCheckIn(e.target.value);
+        // Clear checkout if it's before new checkin
+        if (checkOut && new Date(checkOut) <= selectedDate) {
+          setCheckOut('');
+        }
+      }
+    }}
+    min={new Date().toISOString().split('T')[0]}
+    max={getMaxDate()}
+    required
+    placeholder="Check-in Date"
+  />
+  {checkIn && new Date(checkIn) > new Date(getMaxDate()) && (
+    <WarningMessage>
+      Check-in date cannot be more than 1 year from today
+    </WarningMessage>
+  )}
+  <DateInput
+    type="date"
+    value={checkOut}
+    onChange={(e) => {
+      const selectedDate = new Date(e.target.value);
+      const maxDate = new Date(getMaxDate());
+      if (selectedDate <= maxDate) {
+        setCheckOut(e.target.value);
+      }
+    }}
+    min={checkIn || new Date().toISOString().split('T')[0]}
+    max={getMaxDate()}
+    required
+    placeholder="Check-out Date"
+  />
+  {checkOut && new Date(checkOut) <= new Date(checkIn) && (
+    <WarningMessage>
+      Check-out date must be after check-in date
+    </WarningMessage>
+  )}
+  {checkOut && new Date(checkOut) > new Date(getMaxDate()) && (
+    <WarningMessage>
+      Check-out date cannot be more than 1 year from today
+    </WarningMessage>
+  )}
+            
+  <BookButton
+    onClick={() => {
+      if (checkIn && checkOut && validateDates(checkIn, checkOut)) {
+        navigate(`/available-rooms/${hotelID}/${checkIn}/${checkOut}`);
+      }
+    }}
+    disabled={!checkIn || !checkOut || !validateDates(checkIn, checkOut)}
+  >
+    View Available Rooms
+  </BookButton>
+</BookingSection>
           <ReviewsSection>
           <GetHotelReviews hotelID={hotelID} />
         </ReviewsSection>
