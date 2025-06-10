@@ -67,8 +67,9 @@ const ManageGuests = () => {
         headers: {
           'Content-Type': 'application/json'
         }
+        
       });
-      
+      console.log('Fetched guests:', response.data);
       if (response.data) {
         setGuests(response.data);
         setError('');

@@ -85,6 +85,7 @@ function App() {
             <Route path="/manage-hotels" element={<ManageHotels />} />
             <Route path="/manage-bookings" element={<ManageBookings />} />
             <Route path="/manage-reviews" element={<ManageReviews />} />
+            <Route path="/manage-guests" element={<ViewGuests />} />
 
           </Route>
 
