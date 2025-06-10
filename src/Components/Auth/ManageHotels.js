@@ -195,9 +195,89 @@ const ManageHotels = () => {
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [deletingHotel, setDeletingHotel] = useState(null);
+ const [availableManagers, setAvailableManagers] = useState([]);
+  const [loadingManagers, setLoadingManagers] = useState(false);
+  const StyledSelect = styled.select`
+  width: 100%;
+  padding: 0.875rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  background-color: #f9fafb;
+  
+  &:hover {
+    border-color: #d1d5db;
+  }
 
+  &:focus {
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+    outline: none;
+    background-color: white;
+  }
+
+  option {
+    padding: 8px;
+  }
+`;
+  const fetchAvailableManagers = async () => {
+    setLoadingManagers(true);
+    try {
+      const token = localStorage.getItem('token');
+      const tokenObj = token ? JSON.parse(token) : null;
+
+      // Get all managers
+      const managersResponse = await axios.get(
+        'https://localhost:7125/api/User/by-role/manager',
+        {
+          headers: {
+            'Authorization': `Bearer ${tokenObj.token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      // Get all hotels to check which managers are already assigned
+      const hotelsResponse = await axios.get(
+        'https://localhost:7125/api/Hotels',
+        {
+          headers: {
+            'Authorization': `Bearer ${tokenObj.token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      // Get array of assigned manager IDs
+      const assignedManagerIds = hotelsResponse.data.map(hotel => hotel.managerID);
+
+      // Filter out managers who are already assigned to hotels
+      const unassignedManagers = managersResponse.data.filter(
+        manager => !assignedManagerIds.includes(manager.userID)
+      );
+
+      // If editing, include the current manager of this hotel
+      if (editingHotel?.hotelID) {
+        const currentManager = managersResponse.data.find(
+          m => m.userID === editingHotel.managerID
+        );
+        if (currentManager && !unassignedManagers.includes(currentManager)) {
+          unassignedManagers.push(currentManager);
+        }
+      }
+
+      setAvailableManagers(unassignedManagers);
+    } catch (error) {
+      console.error('Error fetching managers:', error);
+      setError('Failed to load available managers');
+    } finally {
+      setLoadingManagers(false);
+    }
+  };
   useEffect(() => {
     fetchHotels();
+    fetchAvailableManagers();
   }, [fetchHotels]);
 
   const filteredHotels = hotels.filter(hotel => 
@@ -231,6 +311,11 @@ const ManageHotels = () => {
       }
       if (!editingHotel.managerID) {
         setError('Manager ID is required');
+        return;
+      }
+      if (!availableManagers.some(m => m.userID === editingHotel.managerID)) {
+        setError('Selected manager is not available');
+        setIsSubmitting(false);
         return;
       }
 
@@ -462,18 +547,41 @@ const ManageHotels = () => {
               </EditFormGroup>
 
               <EditFormGroup>
-                <label>Manager ID</label>
-                <input
-                  type="number"
-                  value={editingHotel.managerID || ''}
-                  onChange={e => setEditingHotel(prev => ({
-                    ...prev,
-                    managerID: e.target.value
-                  }))}
-                  required
-                  placeholder="Enter manager ID"
-                />
-              </EditFormGroup>
+      <label>Select Manager</label>
+      {loadingManagers ? (
+        <div>Loading available managers...</div>
+      ) : (
+        <StyledSelect
+          value={editingHotel.managerID || ''}
+          onChange={(e) => setEditingHotel(prev => ({
+            ...prev,
+            managerID: parseInt(e.target.value)
+          }))}
+          required
+        >
+          <option value="">Select a manager</option>
+          {availableManagers.map(manager => (
+            <option 
+              key={manager.userID} 
+              value={manager.userID}
+            >
+              {`${manager.name} (ID: ${manager.userID}) - ${manager.email}`}
+
+            </option>
+          ))}
+        </StyledSelect>
+      )}
+      {availableManagers.length === 0 && !loadingManagers && (
+        <span style={{ color: '#666', fontSize: '0.875rem', marginTop: '0.5rem' }}>
+          No unassigned managers available
+        </span>
+      )}
+      {error && (
+        <span style={{ color: 'red', fontSize: '0.875rem', marginTop: '0.5rem' }}>
+          {error}
+        </span>
+      )}
+    </EditFormGroup>
 
               <ModalButtons>
                 <ActionButton
