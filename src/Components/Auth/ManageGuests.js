@@ -261,7 +261,7 @@ const ManageGuests = () => {
       } else if (err.response?.status === 409) {
         setError('Email address is already in use');
       } else {
-        setError('Failed to update guest. Please try again.');
+        setError('');
       }
     } finally {
       setIsSubmitting(false);
@@ -284,7 +284,7 @@ const ManageGuests = () => {
         const checkResponse = await axios.get(
           `https://localhost:7125/api/User/${deletingGuest.userID}`
         );
-        
+        console.log(checkResponse.data);
         if (checkResponse.data.hasActiveBookings) {
           setError('Cannot delete guest with active bookings');
           return;
@@ -337,6 +337,8 @@ const ManageGuests = () => {
           case 403:
             setError('You do not have permission to delete this guest.');
             break;
+          case 415:
+            setError('Unsupported media type. Please try again.');
           default:
             setError('Failed to delete guest. Please try again.');
         }
